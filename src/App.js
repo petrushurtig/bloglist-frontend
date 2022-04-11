@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 
 import Blog from './components/Blog'
-import BlogForm from './components/BlogFrom'
+import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 
@@ -19,9 +19,11 @@ const App = () => {
   const [isError, setIsError] = useState(false)
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
+    const fetchData = async () => {
+      const blogs = await blogService.getAll()
+      setBlogs(blogs)
+    }
+    fetchData()
   }, [])
 
   useEffect(() => {
@@ -29,6 +31,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
+      console.log(user)
     }
   }, [])
 
@@ -67,6 +70,7 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
     try{
       const blog = await blogService.addBlog(blogObject, user)
+      console.log(blog)
       setBlogs(blogs.concat(blog))
       setMessage(`a new blog ${blog.title} by ${blog.author} added`)
       notificationTimeout()
@@ -77,6 +81,44 @@ const App = () => {
         notificationTimeout()
     }
   }
+  const handleLike = async (blog) => {
+    const updatedBlog = {
+      id: blog.id,
+      title: blog.title,
+      author: blog.title,
+      url: blog.url,
+      likes: blog.likes +1,
+    }
+    try {
+      const res = await blogService.updateBlog(updatedBlog, user)
+      setBlogs(blogs.map(b => b.id !== res.id ? b : res))
+      setMessage('updated')
+      notificationTimeout()
+    }
+    catch (exception) {
+      setMessage('failed')
+      setIsError(true)
+      notificationTimeout()
+      console.log(exception.message)
+    }
+  }
+  const removeBlog = async (blog) => {
+    if(window.confirm(`Remove ${blog.title} by ${blog.author}?`)){
+    try{
+    await blogService.removeBlog(blog, user)
+    setBlogs(blogs.filter(b => b.id !== blog.id))
+    setMessage('deleted')
+    notificationTimeout()
+    }
+    catch (exception) {
+      setMessage('failed')
+      setIsError(true)
+      notificationTimeout()
+      console.log(exception.message)
+    }
+  }
+  }
+  
   const blogFormRef = useRef()
 
   return (
@@ -97,13 +139,15 @@ const App = () => {
         <div>
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p> 
           <Togglable buttonLabel='new blog' ref={blogFormRef}>
-            <BlogForm createBlog={addBlog} />
+            <BlogForm createBlog={addBlog} user={user} />
           </Togglable>
         </div>
       }
 
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+      {blogs
+      .sort((a,b) => a.likes < b.likes ? 1 : -1 )
+      .map(blog =>
+        <Blog key={blog.id} blog={blog} user={user} handleLike={handleLike} removeBlog={removeBlog}/>
       )}
     </div>
   )
