@@ -39,7 +39,7 @@ const App = () => {
     setUser(null)
     window.localStorage.clear()
   }
-  
+
   const handleLogin = async (e) => {
     e.preventDefault()
     try {
@@ -63,7 +63,7 @@ const App = () => {
     setTimeout(() => {
       setMessage(null)
       setIsError(false)
-     }, 5000)
+    }, 5000)
   }
 
   const addBlog = async (blogObject) => {
@@ -74,11 +74,11 @@ const App = () => {
       setBlogs(blogs.concat(blog))
       setMessage(`a new blog ${blog.title} by ${blog.author} added`)
       notificationTimeout()
-    } 
-      catch (exception) {
-        setMessage('failed')
-        setIsError(true)
-        notificationTimeout()
+    }
+    catch (exception) {
+      setMessage('failed')
+      setIsError(true)
+      notificationTimeout()
     }
   }
   const handleLike = async (blog) => {
@@ -104,40 +104,40 @@ const App = () => {
   }
   const removeBlog = async (blog) => {
     if(window.confirm(`Remove ${blog.title} by ${blog.author}?`)){
-    try{
-    await blogService.removeBlog(blog, user)
-    setBlogs(blogs.filter(b => b.id !== blog.id))
-    setMessage('deleted')
-    notificationTimeout()
-    }
-    catch (exception) {
-      setMessage('failed')
-      setIsError(true)
-      notificationTimeout()
-      console.log(exception.message)
+      try{
+        await blogService.removeBlog(blog, user)
+        setBlogs(blogs.filter(b => b.id !== blog.id))
+        setMessage('deleted')
+        notificationTimeout()
+      }
+      catch (exception) {
+        setMessage('failed')
+        setIsError(true)
+        notificationTimeout()
+        console.log(exception.message)
+      }
     }
   }
-  }
-  
+
   const blogFormRef = useRef()
 
   return (
     <div>
       <h2>blogs</h2>
       <Notification message={message} error={isError} />
-      
+
       {user === null ?
-      <Togglable buttonLabel='login'>
-      <LoginForm
-        username={username}
-        password={password}
-        handleUsernameChange={({ target }) => setUsername(target.value)}
-        handlePasswordChange={({target}) => setPassword(target.value)}
-        handleSubmit={handleLogin}
-        />
+        <Togglable buttonLabel='login'>
+          <LoginForm
+            username={username}
+            password={password}
+            handleUsernameChange={({ target }) => setUsername(target.value)}
+            handlePasswordChange={({ target }) => setPassword(target.value)}
+            handleSubmit={handleLogin}
+          />
         </Togglable> :
         <div>
-          <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p> 
+          <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
           <Togglable buttonLabel='new blog' ref={blogFormRef}>
             <BlogForm createBlog={addBlog} user={user} />
           </Togglable>
@@ -145,10 +145,10 @@ const App = () => {
       }
 
       {blogs
-      .sort((a,b) => a.likes < b.likes ? 1 : -1 )
-      .map(blog =>
-        <Blog key={blog.id} blog={blog} user={user} handleLike={handleLike} removeBlog={removeBlog}/>
-      )}
+        .sort((a,b) => a.likes < b.likes ? 1 : -1 )
+        .map(blog =>
+          <Blog key={blog.id} blog={blog} user={user} handleLike={handleLike} removeBlog={removeBlog}/>
+        )}
     </div>
   )
 }
