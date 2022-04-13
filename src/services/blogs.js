@@ -6,33 +6,32 @@ const getAll = async () => {
   return res.data
 }
 const addBlog = async (blog, user) => {
-  const res = await axios.post(baseUrl, 
+  const res = await axios.post(baseUrl,
     blog, {
-    headers: {
-      'Authorization': `Bearer ${user.token}`
-    }
-  })
+      headers: {
+        'Authorization': `Bearer ${user.token}`
+      }
+    })
   return res.data
 }
 const updateBlog = async (blog, user) => {
   const res = await axios.put(baseUrl + blog.id ,
-    blog, { 
+    blog, {
       headers: {
         'Authorization': `Bearer ${user.token}`
       }
     })
-  
+
   return res.data
 }
 const removeBlog = async (blog, user) => {
   const res = await axios.delete(baseUrl + blog.id,
-    { 
+    {
       headers: {
         'Authorization': `Bearer ${user.token}`
       }
     })
-    console.log(res)
-    return res
+  return res
 }
 
 export default { getAll, addBlog, updateBlog, removeBlog }

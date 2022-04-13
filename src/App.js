@@ -31,7 +31,6 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
-      console.log(user)
     }
   }, [])
 
@@ -70,7 +69,6 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
     try{
       const blog = await blogService.addBlog(blogObject, user)
-      console.log(blog)
       setBlogs(blogs.concat(blog))
       setMessage(`a new blog ${blog.title} by ${blog.author} added`)
       notificationTimeout()
@@ -143,12 +141,15 @@ const App = () => {
           </Togglable>
         </div>
       }
-
-      {blogs
-        .sort((a,b) => a.likes < b.likes ? 1 : -1 )
-        .map(blog =>
-          <Blog key={blog.id} blog={blog} user={user} handleLike={handleLike} removeBlog={removeBlog}/>
-        )}
+      <ul className="blogs">
+        {blogs
+          .sort((a,b) => a.likes < b.likes ? 1 : -1 )
+          .map(blog =>
+            <li key={blog.id}>
+              <Blog key={blog.id} blog={blog} user={user} handleLike={handleLike} removeBlog={removeBlog}/>
+            </li>
+          )}
+      </ul>
     </div>
   )
 }

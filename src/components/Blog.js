@@ -10,6 +10,9 @@ const Blog = ({ blog, handleLike, removeBlog, user }) => {
   }
 
   const [expanded, setExpanded] = useState(false)
+  const handleVisibility = () => {
+    setExpanded(!expanded)
+  }
 
   return (
     <div style={blogStyle}>
@@ -17,16 +20,21 @@ const Blog = ({ blog, handleLike, removeBlog, user }) => {
         {blog.title} {blog.author}
         {expanded ?
           <>
-            <button onClick={() => setExpanded(false)}>hide</button>
+            <button onClick={handleVisibility}>hide</button>
             <p>likes {blog.likes} <button onClick={() => handleLike(blog)}>like</button></p>
             <p>{blog.url}</p>
             <p>{blog.user.name}</p>
-            {blog.user._id === user.id &&
+            {user ?
+              <div>
+                {blog.user.id === user.id &&
           <button style={{ backgroundColor:'red' }} onClick={() => removeBlog(blog)}>remove</button>
+                }
+              </div>
+              : <></>
             }
           </>
           :
-          <button onClick={() => setExpanded(true)}>view</button>
+          <button onClick={handleVisibility}>view more info</button>
         }
       </div>
 
